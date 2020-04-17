@@ -1,7 +1,7 @@
 {
 	"prefix": "!",
-	"token": "NTkzOTYzNDEyNDE4MDY4NDg1.Xpmi7w.JjA7x4wjXfRurT1ZxNz1AAcDb_8",
-	"guild": "614540245290975243",
+	"token": "BOT TOKEN",
+	"guild": "ENTER GUILD ID (NOT NAME)",
 	"roles": {
 		"owner": "owner",
 		"moderator": "moderator"
