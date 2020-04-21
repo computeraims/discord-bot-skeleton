@@ -11,7 +11,6 @@ function getPermLevel(message) {
 	while (permOrder.length) {
 		const currentLevel = permOrder.shift();
 		if (currentLevel.check(message)) {
-			console.log(currentLevel)
 			permlvl = currentLevel.level;
 			break;
 		}

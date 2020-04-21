@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@keyv/sqlite": "^2.0.2",
     "discord.js": "^12.1.1",
     "keyv": "^4.0.0"
   }
