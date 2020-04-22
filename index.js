@@ -48,13 +48,17 @@ for (const file of pluginFiles) {
 	for (const event of preRunEvents) {
 		preRunListeners.push(client.listenerCount(event))
 	}
+
 	runPlugin()
+
 	let postRunEvents = client.eventNames()
 	let postRunListeners = []
 	for (const event of postRunEvents) {
 		postRunListeners.push(client.listenerCount(event))
 	}
+
 	if (preRunEvents != postRunEvents) console.log(`		-> Loading event ${postRunEvents[postRunEvents.length - 1]}`)
+
 	if (preRunListeners != postRunListeners) {
 		for (let i = 0; i < preRunListeners.length; i++) {
 			if (preRunListeners[i] != postRunListeners[i]) {

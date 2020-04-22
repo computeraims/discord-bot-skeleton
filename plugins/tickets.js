@@ -40,8 +40,23 @@ module.exports = async (client) => {
         if (handlerMessage == reaction.message.id && reaction.emoji.name == '✉️') {
             await reaction.users.remove(user.id)
             let guild = reaction.message.guild
+            let category = reaction.message.guild.channels.cache.find(category => category.name === 'Tickets')
+
+            if (!category) {
+                await guild.channels.create(`Tickets`, {
+                    type: 'category',
+                    permissionOverwrites: [
+                        {
+                            id: guild.roles.everyone,
+                            deny: ['VIEW_CHANNEL']
+                        }
+                    ],
+                })
+            }
+
             guild.channels.create(`Creating ticket...`, {
                 type: 'text',
+                parent: category,
                 permissionOverwrites: [
                     {
                         id: guild.roles.everyone,
@@ -104,7 +119,7 @@ module.exports = async (client) => {
 
             joined = ticket.transcript.join('\n')
             const att = new MessageAttachment(Buffer.from(joined), 'transcript.txt');
-			reaction.message.channel.send(att);
+            reaction.message.channel.send(att);
         }
     });
 
