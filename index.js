@@ -26,7 +26,11 @@ for (const file of pluginFiles) {
 		postRunListeners.push(client.listenerCount(event))
 	}
 
-	if (preRunEvents != postRunEvents) console.log(`		-> Loading event ${postRunEvents[postRunEvents.length - 1]}`)
+	if (preRunEvents.length != postRunEvents.length) {
+		for (let i = preRunEvents.length; i < postRunEvents.length; i++) {
+			console.log(`		-> Loading event ${postRunEvents[i]}`)
+		}
+	}
 
 	if (preRunListeners != postRunListeners) {
 		for (let i = 0; i < preRunListeners.length; i++) {
