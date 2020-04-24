@@ -1,7 +1,7 @@
 const permissions = require('../permissions')
 const { prefix } = require('../config.json')
 const { Collection } = require('discord.js');
-
+const path = require('path')
 
 function getPermLevel(message) {
     let permlvl = 0;
@@ -18,6 +18,18 @@ function getPermLevel(message) {
     return permlvl;
 }
 
+function getCallFile() {
+    var orig = Error.prepareStackTrace;
+    Error.prepareStackTrace = function (_, stack) {
+        return stack;
+    };
+    var err = new Error;
+    Error.captureStackTrace(err, arguments.callee);
+    var stack = err.stack;
+    Error.prepareStackTrace = orig;
+    return stack[1].getFileName()
+}
+
 module.exports = async (client) => {
     client.commands = new Collection()
     client.commands.cooldowns = new Collection();
@@ -30,6 +42,7 @@ module.exports = async (client) => {
 
     // This function allows us to add commands from plugins.
     client.addCommand = (command) => {
+        command.plugin = (path.basename(getCallFile(), '.js'))
         console.log(`		-> Loading command ${command.name}`)
         client.commands.set(command.name, command)
     }
@@ -91,6 +104,47 @@ module.exports = async (client) => {
             console.error(error);
             message.reply('there was an error trying to execute that command!');
         }
+    })
+
+    client.addCommand({
+        name: 'help',
+        description: 'List all commands or info about a specified command.',
+        aliases: ['command', 'commands'],
+        usage: '[command]',
+        level: 0,
+        cooldown: 2,
+        args: false,
+        guildOnly: false,
+        execute(message, args) {
+            const data = []
+
+            if (!args.length) {
+                console.log(client.commands.map(command => command.name))
+                data.push('Here\'s a list of all my commands:');
+                client.commands.forEach(command => { data.push(`\n**${command.plugin}**`); data.push(command.name) })
+                data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!\n[] = optional parameters\n<> = required parameters`);
+                let filtered = data.filter((v, i) => data.indexOf(v) === i)
+                return message.channel.send(filtered, { split: true })
+            }
+
+            const name = args[0].toLowerCase();
+            const command = client.commands.get(name) || client.commands.find(c => c.aliases && c.aliases.includes(name));
+
+            if (!command) {
+                return
+            }
+
+            data.push(`**Name:** ${command.name}`);
+            data.push(`**Description:** ${command.description || 'No description'}`);
+            data.push(`**Aliases:** ${command.aliases ? command.aliases.join(', ') : 'No aliases'}`);
+            data.push(`**Usage:** ${prefix}${command.name} ${command.usage || ''}`);
+            data.push(`**Level:** ${command.level || 0}`)
+            data.push(`**Cooldown:** ${command.cooldown || 0} second(s)`);
+            data.push(`**Arguments:** ${command.args ? 'Yes' : 'No'}`)
+            data.push(`**Guild Only:** ${command.guildOnly ? 'Yes' : 'No'}`)
+
+            message.channel.send(data, { split: true });
+        },
     })
 
     client.addCommand({

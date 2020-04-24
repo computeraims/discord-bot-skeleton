@@ -4,7 +4,10 @@ module.exports = async (client) => {
     client.addCommand({
         name: 'example',
         description: 'Example!',
+        aliases: ['examplealias'],
+        usage: '[example parameter]',
         level: 0,
+        cooldown: 2,
         args: false,
         guildOnly: false,
         execute(message, args, level) {
