@@ -10,7 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "@keyv/sqlite": "^2.0.2",
+    "better-sqlite3": "^7.0.1",
     "discord.js": "^12.1.1",
-    "keyv": "^4.0.0"
+    "enmap": "^5.2.4",
+    "gamedig": "^2.0.20",
+    "keyv": "^4.0.0",
+    "node-fetch": "^2.6.0"
   }
 }

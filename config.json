@@ -1,9 +1,4 @@
 {
-	"prefix": "!",
-	"token": "NTkzOTYzNDEyNDE4MDY4NDg1.XqJdsg.CbWoWH-b0fDoo5-kafJChn-D_mA",
-	"guild": "614540245290975243",
-	"roles": {
-		"owner": "owner",
-		"moderator": "moderator"
-	}
+	"globalPrefix": "BOT GLOBAL PREFIX",
+	"token": "BOT TOKEN"
 }

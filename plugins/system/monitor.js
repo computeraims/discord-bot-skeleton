@@ -1,8 +1,4 @@
 module.exports = async client => {
-    client.on('ready', () => {
-        console.log('Ready')
-    })
-
     client.on('error', (error) => {
         console.log(`Discord Error: ${error}`)
     })
@@ -13,6 +9,7 @@ module.exports = async client => {
 
     client.on('invalidated', () => {
         console.log(`Discord Error: Client session has become invalidated`)
+        client.destroy()
     })
 
     client.on('rateLimit', () => {

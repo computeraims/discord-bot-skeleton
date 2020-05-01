@@ -1,0 +1,39 @@
+module.exports = async (client) => {
+    console.log('Hello from example plugin!')
+    
+    // Creating configuration settings
+    client.on('pluginsLoaded', async () => {
+        // Must wait for pluginsLoaded event to fire before creating settings.
+        await client.guildSettings.addSetting('exampleSetting', 'exampleValue')
+        await client.guildSettings.addSetting('exampleSetting2', [])
+    })
+
+    // Setting configuration settings
+    await client.guildSettings.get('GUILD ID') // Returns an object of settings
+    guildSettings.exampleSetting = 'A different example value'
+    await client.guildSettings.set('GUILD ID', guildSettings)
+
+    // OR SIMPLY
+
+    await client.guildSettings.set('GUILD ID', 'A different example value', exampleSetting)
+
+    // Adding commands
+    client.addCommand({
+        name: 'example',
+        description: 'Example!',
+        aliases: ['examplealias'],
+        usage: '<required parameter> [optional parameter] (this isnt actually enforced)',
+        permissions: ['ADMINISTRATOR'], // An array of Discord permissions required to execute the command, this is independent of the bot
+        cooldown: 2,
+        args: false,
+        guildOnly: false,
+        execute(message, args, level) {
+            message.channel.send('Example.');
+        },
+    })
+
+    // Hooking discord.js events
+    client.on("guildMemberAdd", (member) => {
+        console.log(`${member.name} has joined!`)
+    })
+}
