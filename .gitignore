@@ -109,3 +109,4 @@ data/enmap.sqlite-shm
 config.json
 config.json
 config.json
+*.json
