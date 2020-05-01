@@ -1,4 +1,3 @@
-const permissions = require('../../permissions')
 const { globalPrefix } = require('../../config.json')
 const { Collection } = require('discord.js');
 const path = require('path')
