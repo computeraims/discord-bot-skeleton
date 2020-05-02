@@ -22,6 +22,11 @@ class db {
         await this.db.defer
         return await this.db.ensure(key, value, path)
     }
+
+    async array() {
+        await this.db.defer
+        return await this.db.array()
+    }
 }
 
 module.exports = db

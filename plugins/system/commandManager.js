@@ -31,7 +31,7 @@ function getCallFile() {
 
 module.exports = async (client) => {
 	client.commands = new Collection()
-	client.commands.cooldowns = new Collection();
+	client.cooldowns = new Collection();
 
 	// This function allows us to add commands from plugins.
 	client.addCommand = (command) => {
@@ -77,12 +77,12 @@ module.exports = async (client) => {
 			return message.channel.send(reply);
 		}
 
-		if (!client.commands.cooldowns.has(command.name)) {
-			client.commands.cooldowns.set(command.name, new Collection());
+		if (!client.cooldowns.has(command.name)) {
+			client.cooldowns.set(command.name, new Collection());
 		}
 
 		const now = Date.now();
-		const timestamps = client.commands.cooldowns.get(command.name);
+		const timestamps = client.cooldowns.get(command.name);
 		const cooldownAmount = (command.cooldown || 3) * 1000;
 
 		if (timestamps.has(message.author.id)) {

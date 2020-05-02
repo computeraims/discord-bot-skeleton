@@ -1,8 +1,9 @@
-const { MessageEmbed, MessageAttachment } = require('discord.js');
+const { MessageEmbed, MessageAttachment, Collection } = require('discord.js');
 
 module.exports = async (client) => {
 	client.on('pluginsLoaded', async () => {
 		await client.guildSettings.addSetting('ticketRoles', [])
+		await client.guildSettings.addSetting('maxTickets', 2)
 	})
 
 	client.addCommand({
@@ -85,10 +86,41 @@ module.exports = async (client) => {
 
 		// Check if we should open a ticket
 		if (reaction.message.channel.type == 'text' && reaction.emoji.name == '✉️') {
+			await reaction.users.remove(user.id)
+
+			if (!client.cooldowns.has('tickets')) {
+				client.cooldowns.set('tickets', new Collection());
+			}
+
+			const now = Date.now();
+			const timestamps = client.cooldowns.get('tickets');
+			const cooldownAmount = (10) * 1000;
+
+			if (timestamps.has(user.id)) {
+				const expirationTime = timestamps.get(user.id) + cooldownAmount;
+
+				if (now < expirationTime) {
+					const timeLeft = (expirationTime - now) / 1000;
+					return
+				}
+			}
+
+			timestamps.set(user.id, now);
+			setTimeout(() => timestamps.delete(user.id), cooldownAmount);
+
 			const tickets = new (require('../../db'))(`tickets-${reaction.message.guild.id}`)
+			let openTicketCount = 0
+			for (ticket of await tickets.array()) {
+				if (ticket.openedBy == user.id && ticket.closedBy == null) {
+					openTicketCount++
+				}
+			}
+			let maxTickets = await client.guildSettings.get(reaction.message.guild.id, 'maxTickets')
+			console.log(maxTickets)
+			if (openTicketCount >= maxTickets) return
+
 			let handlerMessage = await tickets.get('handler')
 			if (handlerMessage != reaction.message.id) return;
-			await reaction.users.remove(user.id)
 			let guild = reaction.message.guild
 			let category = reaction.message.guild.channels.cache.find(category => category.name === 'Tickets')
 
@@ -185,7 +217,6 @@ module.exports = async (client) => {
 	client.on('message', async (message) => {
 		if (message.channel.type == 'text' && message.channel.name.startsWith('ticket-')) {
 			const tickets = new (require('../../db'))(`tickets-${message.guild.id}`)
-			console.log(tickets)
 			let ticket = await tickets.get(message.channel.name.slice(7))
 			ticket.transcript.push(`${message.author.username} (${message.author.id}): ${message.content}`)
 			await tickets.set(message.channel.id, ticket);
