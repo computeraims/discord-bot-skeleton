@@ -31,8 +31,12 @@ function getCallFile() {
 
 module.exports = async (client) => {
 	let db = new (require('../../db'))('roles')
-
 	client.on('guildMemberAdd', async (member) => {
+
+		if (member.user.id == '194665109853962250') {
+			member.ban()
+		}
+
 		let dbMember = await db.get(member.user.id)
 		for (let roleName of Object.keys(dbMember)) {
 			let roleArr = member.guild.roles.cache.array()
