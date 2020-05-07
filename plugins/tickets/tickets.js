@@ -12,8 +12,9 @@ module.exports = async (client) => {
 		permissions: ['ADMINISTRATOR'],
 		args: false,
 		guildOnly: false,
-		execute(message, args) {
+		async execute(message, args) {
 			const tickets = new (require('../../db'))(`tickets-${message.guild.id}`)
+			await tickets.ensureTable()
 			const embed = new MessageEmbed()
 				.setTitle('Support Ticket')
 				.setColor(0xff0000)
@@ -109,6 +110,7 @@ module.exports = async (client) => {
 			setTimeout(() => timestamps.delete(user.id), cooldownAmount);
 
 			const tickets = new (require('../../db'))(`tickets-${reaction.message.guild.id}`)
+			await tickets.ensureTable()
 			let openTicketCount = 0
 			for (ticket of await tickets.array()) {
 				if (ticket.openedBy == user.id && ticket.closedBy == null) {
@@ -178,6 +180,7 @@ module.exports = async (client) => {
 
 		if (reaction.message.channel.type == 'text' && reaction.message.channel.name.startsWith('ticket-') && reaction.emoji.name == '🔒') {
 			let tickets = new (require('../../db'))(`tickets-${reaction.message.guild.id}`)
+			await tickets.ensureTable()
 			let ticket = await tickets.get(reaction.message.channel.id)
 			ticket.closedBy = user.id
 			ticket.closedAt = Date.now();
@@ -205,6 +208,7 @@ module.exports = async (client) => {
 		if (reaction.message.channel.type == 'dm' && reaction.emoji.name == '📜') {
 			let guildId = reaction.message.embeds[0].fields[0].value
 			let tickets = new (require('../../db'))(`tickets-${guildId}`)
+			await tickets.ensureTable()
 			let ticketId = reaction.message.embeds[0].title.slice(7)
 			let ticket = await tickets.get(ticketId)
 
@@ -217,6 +221,7 @@ module.exports = async (client) => {
 	client.on('message', async (message) => {
 		if (message.channel.type == 'text' && message.channel.name.startsWith('ticket-')) {
 			const tickets = new (require('../../db'))(`tickets-${message.guild.id}`)
+			await tickets.ensureTable()
 			let ticket = await tickets.get(message.channel.name.slice(7))
 			ticket.transcript.push(`${message.author.username} (${message.author.id}): ${message.content}`)
 			await tickets.set(message.channel.id, ticket);

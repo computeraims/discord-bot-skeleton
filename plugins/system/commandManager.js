@@ -52,7 +52,6 @@ module.exports = async (client) => {
 		}
 
 		if (!message.content.startsWith(prefix) && !message.content.startsWith(globalPrefix) || message.author.bot) return;
-
 		const args = message.content.slice(prefix.length).split(/ +/);
 		const commandName = args.shift().toLowerCase();
 

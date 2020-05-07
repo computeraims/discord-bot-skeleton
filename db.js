@@ -1,31 +1,69 @@
+function objToStrMap(obj) {
+    let strMap = new Map();
+    for (let k of Object.keys(obj)) {
+        strMap.set(k, obj[k]);
+    }
+    return strMap;
+}
+
+const knex = require('knex')({
+    client: 'sqlite3',
+    connection: {
+        filename: "./database.sqlite"
+    },
+    useNullAsDefault: true
+});
+
 class db {
-    constructor(namespace) {
-        this.db = new (require('enmap'))({ name: namespace })
+    constructor(table) {
+        this.table = table
+        this.knex = knex
     }
 
-    async get(key, path) {
-        await this.db.defer
-        return await this.db.get(key, path)
+    async ensureTable() {
+        let exists = await this.knex.schema.hasTable(this.table)
+        if (!exists) {
+            await this.knex.schema.createTable(this.table, t => {
+                t.string('key').primary();
+                t.json('value')
+            })
+            console.log(`Creating table ${this.table}`)
+        }
     }
 
-    async set(key, value, path) {
-        await this.db.defer
-        return await this.db.set(key, value, path)
+    async get(key) {
+        let rows = await this.knex.select('value').from(this.table).where({ key: key })
+        let data = JSON.parse(rows[0].value)
+        return data
+
     }
 
-    async delete(key, path) {
-        await this.db.defer
-        return await this.db.delete(key, path)
+    async set(key, value) {
+        let rows = await this.knex.select('*').from(this.table).where({ key: key })
+        if (!rows.length) {
+            await this.knex(this.table).insert({ key: key, value: JSON.stringify(value) })
+        } else {
+            await this.knex(this.table).where({ key: key }).update({ value: JSON.stringify(value) })
+        }
     }
 
-    async ensure(key, value, path) {
-        await this.db.defer
-        return await this.db.ensure(key, value, path)
+    async ensure(key, value) {
+        let rows = await this.knex.select('*').from(this.table).where({ key: key })
+        if (!rows.length) {
+            await this.knex(this.table).insert({ key: key, value: JSON.stringify(value) })
+        }
     }
 
     async array() {
-        await this.db.defer
-        return await this.db.array()
+        let rows = await this.knex.select('*').from(this.table)
+        let toObj = {}
+        for (let row of rows) {
+            let key = row.key
+            let value = JSON.parse(row.value)
+            toObj[key] = value
+        }
+        let map = objToStrMap(toObj)
+        return Array.from(map.values());
     }
 }
 
