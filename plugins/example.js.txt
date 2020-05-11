@@ -2,11 +2,8 @@ module.exports = async (client) => {
     console.log('Hello from example plugin!')
     
     // Creating configuration settings
-    client.on('pluginsLoaded', async () => {
-        // Must wait for pluginsLoaded event to fire before creating settings.
-        await client.guildSettings.addSetting('exampleSetting', 'exampleValue')
-        await client.guildSettings.addSetting('exampleSetting2', [])
-    })
+    await client.guildSettings.addSetting('ticketRoles', [])
+	await client.guildSettings.addSetting('maxTickets', 2)
 
     // Setting configuration settings
     await client.guildSettings.get('GUILD ID') // Returns an object of settings
@@ -14,7 +11,6 @@ module.exports = async (client) => {
     await client.guildSettings.set('GUILD ID', guildSettings)
 
     // OR SIMPLY
-
     await client.guildSettings.set('GUILD ID', 'A different example value', exampleSetting)
 
     // Adding commands
