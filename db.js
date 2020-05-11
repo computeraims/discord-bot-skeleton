@@ -32,8 +32,11 @@ class db {
     }
 
     async get(key) {
-        let rows = await this.knex.select('value').from(this.table).where({ key: key })
+        let rows = await this.knex.select('*').from(this.table).where({ key: key })
+        if (!rows.length) return null
+
         let data = JSON.parse(rows[0].value)
+
         return data
 
     }
@@ -45,6 +48,10 @@ class db {
         } else {
             await this.knex(this.table).where({ key: key }).update({ value: JSON.stringify(value) })
         }
+    }
+
+    async delete(key) {
+        await this.knex(this.table).where('key', key).del()
     }
 
     async ensure(key, value) {

@@ -5,11 +5,11 @@ module.exports = async client => {
 
     client.guildSettings = new (require('../../db'))('guildSettings')
     await client.guildSettings.ensureTable()
+
     // Ensures guild settings exist
     let guildsArr = client.guilds.cache.array()
     for (const guild of guildsArr) {
         await client.guildSettings.ensure(guild.id, defaultSettings)
-        console.log(`Ensuring ${guild.name} in database.`)
     }
 
     client.guildSettings.addSetting = async (key, value) => {
@@ -17,6 +17,7 @@ module.exports = async client => {
             let guildSettings = await client.guildSettings.get(guild.id)
             if (!guildSettings[key]) {
                 guildSettings[key] = value
+                defaultSettings[key] = value
                 await client.guildSettings.set(guild.id, guildSettings)
                 console.log(`			-> Generating setting ${key} as ${JSON.stringify(value)} for ${guild.name}`)
             }

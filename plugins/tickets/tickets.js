@@ -1,10 +1,10 @@
 const { MessageEmbed, MessageAttachment, Collection } = require('discord.js');
 
 module.exports = async (client) => {
-	client.on('pluginsLoaded', async () => {
-		await client.guildSettings.addSetting('ticketRoles', [])
-		await client.guildSettings.addSetting('maxTickets', 2)
-	})
+	await client.guildSettings.addSetting('ticketRoles', [])
+	await client.guildSettings.addSetting('maxTickets', 2)
+
+	const db = client.db('tickets')
 
 	client.addCommand({
 		name: 'ticketbox',
@@ -108,9 +108,7 @@ module.exports = async (client) => {
 
 			timestamps.set(user.id, now);
 			setTimeout(() => timestamps.delete(user.id), cooldownAmount);
-
-			const tickets = new (require('../../db'))(`tickets-${reaction.message.guild.id}`)
-			await tickets.ensureTable()
+			await db.ensureTable()
 			let openTicketCount = 0
 			for (ticket of await tickets.array()) {
 				if (ticket.openedBy == user.id && ticket.closedBy == null) {
@@ -118,10 +116,9 @@ module.exports = async (client) => {
 				}
 			}
 			let maxTickets = await client.guildSettings.get(reaction.message.guild.id, 'maxTickets')
-			console.log(maxTickets)
 			if (openTicketCount >= maxTickets) return
 
-			let handlerMessage = await tickets.get('handler')
+			let handlerMessage = await db.get()
 			if (handlerMessage != reaction.message.id) return;
 			let guild = reaction.message.guild
 			let category = reaction.message.guild.channels.cache.find(category => category.name === 'Tickets')

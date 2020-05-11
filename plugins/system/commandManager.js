@@ -36,7 +36,6 @@ module.exports = async (client) => {
 	// This function allows us to add commands from plugins.
 	client.addCommand = (command) => {
 		command.plugin = (path.basename(getCallFile(), '.js'))
-		console.log(`			-> Loading command ${command.name}`)
 		client.commands.set(command.name, command)
 	}
 
