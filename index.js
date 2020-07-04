@@ -34,12 +34,15 @@ client.once('ready', async () => {
 		}
 		plugins.push(pluginStructure)
 	}
+
+
 	var systemIndex = plugins.findIndex(element => { return element.name === 'system' })
 	for (let func of plugins[systemIndex].functions) {
 		await func()
-		plugins.splice(systemIndex, 0)
 	}
 
+	plugins.splice(systemIndex, 1)
+	
 	for (let plugin of plugins) {
 		for (let func of plugin.functions) {
 			await func()
